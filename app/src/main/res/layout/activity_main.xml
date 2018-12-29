@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/tv_is_root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:padding="15dp"
+        android:text="是否有root权限"
+        android:textColor="#fff" />
+
+    <TextView
+        android:id="@+id/tv_get_root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:padding="15dp"
+        android:text="应用申请root权限"
+        android:textColor="#fff" />
+
+    <TextView
+        android:id="@+id/tv_get_assemble"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:padding="15dp"
+        android:text="应用申请无障碍权限"
+        android:textColor="#fff" />
+
+
+    <TextView
+        android:id="@+id/tv_start_service"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:padding="15dp"
+        android:text="开启服务"
+        android:textColor="#fff"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/listFile"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>
