@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hjianfei.service.MainService;
 import com.hjianfei.utils.Utils;
 
 public class MainActivity extends AppCompatActivity {
@@ -55,22 +56,35 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                lvFile = (TextView) findViewById(R.id.listFile);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        String[] strings = new String[1];
-                        strings[0] = "cp /storage/emulated/0/国际服/libUE4.so /data/data/com.tencent.ig/lib/libUE4.so";
-                        final Boolean content = Utils.execCmdsforResult(strings);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                lvFile.setText(content + "==");
-                            }
-                        });
+//                lvFile = (TextView) findViewById(R.id.listFile);
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        String[] strings = new String[1];
+//                        strings[0] = "cp /storage/emulated/0/国际服/libUE4.so /data/data/com.tencent.ig/lib/libUE4.so";
+//                        final Boolean content = Utils.execCmdsforResult(strings);
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                lvFile.setText(content + "==");
+//                            }
+//                        });
+//
+//                    }
+//                }).start();
 
-                    }
-                }).start();
+                if (Settings.canDrawOverlays(MainActivity.this)) {
+                    Intent intent = new Intent(MainActivity.this, MainService.class);
+                    Toast.makeText(MainActivity.this, "已开启Toucher", Toast.LENGTH_SHORT).show();
+                    startService(intent);
+                    finish();
+                } else {
+                    //若没有权限，提示获取.
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                    Toast.makeText(MainActivity.this, "需要取得权限以使用悬浮窗", Toast.LENGTH_SHORT).show();
+                    startActivity(intent);
+                    finish();
+                }
             }
         });
     }
