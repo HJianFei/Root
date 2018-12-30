@@ -1,27 +1,30 @@
 package com.hjianfei.root;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.hjianfei.service.MainService;
+import com.hjianfei.service.TrackerService;
+import com.hjianfei.utils.BaseApplication;
+import com.hjianfei.utils.EventBean;
 import com.hjianfei.utils.Utils;
 
-public class MainActivity extends AppCompatActivity {
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
-    private Handler mHandler = null;
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
         setContentView(R.layout.activity_main);
-
-        mHandler = new Handler();
         findViewById(R.id.tv_is_root).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -51,43 +54,77 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.tv_start_service).setOnClickListener(new View.OnClickListener() {
 
-            private TextView lvFile;
-
             @Override
             public void onClick(View view) {
 
-//                lvFile = (TextView) findViewById(R.id.listFile);
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        String[] strings = new String[1];
-//                        strings[0] = "cp /storage/emulated/0/国际服/libUE4.so /data/data/com.tencent.ig/lib/libUE4.so";
-//                        final Boolean content = Utils.execCmdsforResult(strings);
-//                        runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                lvFile.setText(content + "==");
-//                            }
-//                        });
-//
-//                    }
-//                }).start();
-
                 if (Settings.canDrawOverlays(MainActivity.this)) {
-                    Intent intent = new Intent(MainActivity.this, MainService.class);
-                    Toast.makeText(MainActivity.this, "已开启Toucher", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, TrackerService.class);
                     startService(intent);
-                    finish();
+                    showNormalDialog();
                 } else {
                     //若没有权限，提示获取.
                     Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-                    Toast.makeText(MainActivity.this, "需要取得权限以使用悬浮窗", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "需要使用悬浮窗权限，监测游戏封号行为", Toast.LENGTH_SHORT).show();
                     startActivity(intent);
-                    finish();
                 }
+            }
+        });
+        findViewById(R.id.tv_end_service).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Utils.removeFile(BaseApplication.tempPath, BaseApplication.gamePath, 2);
             }
         });
     }
 
+    private void showNormalDialog() {
+        /* @setIcon 设置对话框图标
+         * @setTitle 设置对话框标题
+         * @setMessage 设置对话框消息提示
+         * setXXX方法返回Dialog对象，因此可以链式设置属性
+         */
+        final AlertDialog.Builder normalDialog =
+                new AlertDialog.Builder(MainActivity.this);
+        normalDialog.setIcon(R.mipmap.ic_launcher);
+        normalDialog.setTitle("重要提示");
+        normalDialog.setMessage("必须保持专用防封在后台运行,游戏结束后返回专用防封软件关闭防封，发送正常数据到服务器以防止游戏追封");
+        normalDialog.setPositiveButton("确定",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(MainActivity.this, "防封开启成功，请保持专用防封在后台运行", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                });
+        normalDialog.setNegativeButton("关闭",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //...To-do
+                        Toast.makeText(MainActivity.this, "防封开启成功，请保持专用防封在后台运行", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                });
+        // 显示
+        normalDialog.show();
+    }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void eventMessage(EventBean eventBean) {
+        if (eventBean.eventType == 1) {
+            if (eventBean.type == 1) {
+                Toast.makeText(this, "专用防封已开启检测游戏封号行为，请保持软件在后台运行", Toast.LENGTH_SHORT).show();
+            } else if (eventBean.type == 2) {
+                Toast.makeText(this, "专用防封数据发送成功", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(this, "数据出错，请联系管理员", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
 }

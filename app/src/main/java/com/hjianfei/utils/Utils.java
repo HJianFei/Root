@@ -2,11 +2,10 @@ package com.hjianfei.utils;
 
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -71,34 +70,6 @@ public class Utils {
         return bool;
     }
 
-
-    /**
-     * 复制文件
-     *
-     * @param oldFilePath
-     * @param newFilePath
-     * @return
-     * @throws IOException
-     */
-    public static boolean fileCopy(String oldFilePath, String newFilePath) throws IOException {
-        //如果原文件不存在
-        if (fileExists(oldFilePath) == false) {
-            return false;
-        }
-        //获得原文件流
-        FileInputStream inputStream = new FileInputStream(new File(oldFilePath));
-        byte[] data = new byte[1024];
-        //输出流
-        FileOutputStream outputStream = new FileOutputStream(new File(newFilePath));
-        //开始处理流
-        while (inputStream.read(data) != -1) {
-            outputStream.write(data);
-        }
-        inputStream.close();
-        outputStream.close();
-        return true;
-    }
-
     /**
      * 文件是否存在
      *
@@ -110,56 +81,11 @@ public class Utils {
         return file.exists();
     }
 
-
-    //翻译并执行相应的adb命令
-    public static boolean exusecmd(String command) {
-        Process process = null;
-        DataOutputStream os = null;
-        try {
-            process = Runtime.getRuntime().exec("su");
-            os = new DataOutputStream(process.getOutputStream());
-            os.writeBytes(command + "\n");
-            os.writeBytes("exit\n");
-            os.flush();
-            Log.e("updateFile", "======000==writeSuccess======");
-            process.waitFor();
-        } catch (Exception e) {
-            Log.e("updateFile", "======111=writeError======" + e.toString());
-            return false;
-        } finally {
-            try {
-                if (os != null) {
-                    os.close();
-                }
-                if (process != null) {
-                    process.destroy();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return true;
-    }
-
-    /**
-     * 移动文件
-     *
-     * @param filePath
-     * @param sysFilePath
-     */
-    public static void moveFileToSystem(String filePath, String sysFilePath) {
-        exusecmd("mount -o rw,remount /system");
-        exusecmd("chmod 777 /system");
-        exusecmd("cp  " + filePath + " " + sysFilePath);
-    }
-
-
     public static Boolean execCmdsforResult(String[] cmds) {
         try {
             Process process = Runtime.getRuntime().exec("su");
             OutputStream os = process.getOutputStream();
             process.getErrorStream();
-//            InputStream is = process.getInputStream();
             int i = cmds.length;
             for (int j = 0; j < i; j++) {
                 String str = cmds[j];
@@ -168,19 +94,34 @@ public class Utils {
             os.write("exit\n".getBytes());
             os.flush();
             os.close();
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-//            while (true) {
-//                String str = reader.readLine();
-//                if (str == null)
-//                    break;
-//                list.add(str);
-//            }
-//            reader.close();
             process.waitFor();
             process.destroy();
             return true;
         } catch (Exception localException) {
             return false;
         }
+    }
+
+    public static void removeFile(final String fromFilePath, final String toFilePath, final int type) {
+        if (!fileExists(fromFilePath)) {
+            EventBus.getDefault().post(new EventBean(0, 1));
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String[] strings = new String[3];
+                strings[0] = "cp " + fromFilePath + " " + toFilePath;
+                strings[1] = "rm -r " + fromFilePath;
+                strings[2] = "chmod -R 664 " + toFilePath;
+                boolean isSuccess = Utils.execCmdsforResult(strings);
+                LogUtil.d("onResponse", "so库替换：" + isSuccess);
+                if (isSuccess) {
+                    EventBus.getDefault().post(new EventBean(1, type));
+                } else {
+                    EventBus.getDefault().post(new EventBean(2, type));
+                }
+
+            }
+        }).start();
     }
 }
