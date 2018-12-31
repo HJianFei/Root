@@ -39,7 +39,7 @@ public class TrackerService extends AccessibilityService {
         if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             if (event.getPackageName().toString().equals("com.tencent.tmgp.pubgmhd") && event.getClassName().toString().equals("com.epicgames.ue4.GameActivity")) {
                 if (!isFirstSetting) {
-                    Utils.removeFile(BaseApplication.gamePath, BaseApplication.tempPath, 1);
+                    Utils.removeFile(BaseApplication.gamePath, "220", 1);
                     isFirstSetting = true;
                 }
             }

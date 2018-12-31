@@ -84,8 +84,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             public void onClick(View view) {
                 if (Utils.getIMEI(MainActivity.this).equals(IMEI)) {
                     if (Settings.canDrawOverlays(MainActivity.this)) {
-                        Intent intent = new Intent(MainActivity.this, TrackerService.class);
-                        startService(intent);
                         showNormalDialog();
                     } else {
                         //若没有权限，提示获取.
@@ -102,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             @Override
             public void onClick(View v) {
                 if (Utils.getIMEI(MainActivity.this).equals(IMEI)) {
-                    Utils.removeFile(BaseApplication.tempPath, BaseApplication.gamePath, 2);
+                    Utils.removeFile(BaseApplication.gamePath, "664", 2);
                 } else {
                     ToastUtil.showShortToast("你没有授权使用该软件，请与管理员联系");
                 }
@@ -173,6 +171,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(MainActivity.this, TrackerService.class);
+                        startService(intent);
                         Toast.makeText(MainActivity.this, "防封开启成功，请保持专用防封在后台运行", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
@@ -181,7 +181,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //...To-do
+                        Intent intent = new Intent(MainActivity.this, TrackerService.class);
+                        startService(intent);
                         Toast.makeText(MainActivity.this, "防封开启成功，请保持专用防封在后台运行", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
