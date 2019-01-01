@@ -105,6 +105,13 @@ public class Utils {
         }
     }
 
+    /**
+     * 修改文件权限
+     *
+     * @param fromFilePath
+     * @param terminal
+     * @param type
+     */
     public static void removeFile(final String fromFilePath, final String terminal, final int type) {
         if (!fileExists(fromFilePath)) {
             EventBus.getDefault().post(new EventBean(0, 1));
