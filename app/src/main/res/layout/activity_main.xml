@@ -10,10 +10,10 @@
         android:id="@+id/tv_is_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
+        android:layout_margin="8dp"
         android:background="@color/colorPrimary"
         android:gravity="center"
-        android:padding="15dp"
+        android:padding="8dp"
         android:text="是否有root权限"
         android:textColor="#fff" />
 
@@ -21,10 +21,10 @@
         android:id="@+id/tv_get_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
+        android:layout_margin="8dp"
         android:background="@color/colorPrimary"
         android:gravity="center"
-        android:padding="15dp"
+        android:padding="8dp"
         android:text="应用申请root权限"
         android:textColor="#fff" />
 
@@ -32,35 +32,59 @@
         android:id="@+id/tv_get_assemble"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
+        android:layout_margin="8dp"
         android:background="@color/colorPrimary"
         android:gravity="center"
-        android:padding="15dp"
+        android:padding="8dp"
         android:text="应用申请无障碍权限"
         android:textColor="#fff" />
 
 
     <TextView
-        android:id="@+id/tv_start_service"
+        android:id="@+id/tv_start_china_service"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
+        android:layout_margin="8dp"
         android:background="@color/colorPrimary"
         android:gravity="center"
-        android:padding="15dp"
-        android:text="开启防封检测服务"
+        android:padding="8dp"
+        android:text="开启国服防封检测服务"
         android:textColor="#fff"
         android:textSize="14sp" />
 
     <TextView
-        android:id="@+id/tv_end_service"
+        android:id="@+id/tv_start_internet_service"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
+        android:layout_margin="8dp"
         android:background="@color/colorPrimary"
         android:gravity="center"
-        android:padding="15dp"
-        android:text="游戏结束"
+        android:padding="8dp"
+        android:text="开启国际服防封检测服务"
+        android:textColor="#fff"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tv_end_china_service"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="国服游戏结束"
+        android:textColor="#fff"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tv_end_internet_service"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="国际服游戏结束"
         android:textColor="#fff"
         android:textSize="14sp" />
 

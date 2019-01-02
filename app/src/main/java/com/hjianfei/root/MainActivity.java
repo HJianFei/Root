@@ -13,7 +13,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.android.tu.loadingdialog.LoadingDailog;
-import com.hjianfei.service.TrackerService;
+import com.hjianfei.service.GTrackerService;
+import com.hjianfei.service.ITrackerService;
 import com.hjianfei.utils.BaseApplication;
 import com.hjianfei.utils.EventBean;
 import com.hjianfei.utils.ToastUtil;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     private LoadingDailog dialog;
 
-    private static String IMEI = "866146032212627";
+    private static String IMEI = "355457087264381";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +45,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             public void onClick(View view) {
                 if (Utils.getIMEI(MainActivity.this).equals(IMEI)) {
                     if (Utils.isRoot()) {
-                        Toast.makeText(MainActivity.this, "你的手机已获取root权限", Toast.LENGTH_SHORT).show();
+                        ToastUtil.showShortToast("你的手机已获取root权限");
                     } else {
-                        Toast.makeText(MainActivity.this, "你的手机没有root权限", Toast.LENGTH_SHORT).show();
+                        ToastUtil.showShortToast("你的手机没有root权限");
                     }
                 } else {
                     ToastUtil.showShortToast("你没有授权使用该软件，请与管理员联系");
@@ -59,9 +60,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 if (Utils.getIMEI(MainActivity.this).equals(IMEI)) {
                     boolean b = Utils.upgradeRootPermission(getPackageCodePath());
                     if (b) {
-                        Toast.makeText(MainActivity.this, "已获取root权限", Toast.LENGTH_SHORT).show();
+                        ToastUtil.showShortToast("已获取root权限");
                     } else {
-                        Toast.makeText(MainActivity.this, "获取root权限失败", Toast.LENGTH_SHORT).show();
+                        ToastUtil.showShortToast("获取root权限失败");
                     }
                 } else {
                     ToastUtil.showShortToast("你没有授权使用该软件，请与管理员联系");
@@ -78,16 +79,16 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 }
             }
         });
-        findViewById(R.id.tv_start_service).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.tv_start_china_service).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
                 if (Utils.getIMEI(MainActivity.this).equals(IMEI)) {
                     if (Settings.canDrawOverlays(MainActivity.this)) {
-                        showNormalDialog();
+                        showNormalDialog(1);
                     } else {
                         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-                        Toast.makeText(MainActivity.this, "需要使用悬浮窗权限，监测游戏封号行为", Toast.LENGTH_SHORT).show();
+                        ToastUtil.showShortToast("需要使用悬浮窗权限，监测游戏封号行为");
                         startActivity(intent);
                     }
                 } else {
@@ -95,11 +96,38 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 }
             }
         });
-        findViewById(R.id.tv_end_service).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.tv_start_internet_service).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                if (Utils.getIMEI(MainActivity.this).equals(IMEI)) {
+                    if (Settings.canDrawOverlays(MainActivity.this)) {
+                        showNormalDialog(2);
+                    } else {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                        ToastUtil.showShortToast("需要使用悬浮窗权限，监测游戏封号行为");
+                        startActivity(intent);
+                    }
+                } else {
+                    ToastUtil.showShortToast("你没有授权使用该软件，请与管理员联系");
+                }
+            }
+        });
+        findViewById(R.id.tv_end_china_service).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (Utils.getIMEI(MainActivity.this).equals(IMEI)) {
-                    Utils.removeFile(BaseApplication.gamePath, "664", 2);
+                    Utils.removeChinaFile(BaseApplication.ChinaGamePath, "664", 2);
+                } else {
+                    ToastUtil.showShortToast("你没有授权使用该软件，请与管理员联系");
+                }
+            }
+        });
+        findViewById(R.id.tv_end_internet_service).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Utils.getIMEI(MainActivity.this).equals(IMEI)) {
+                    Utils.removeChinaFile(BaseApplication.ChinaGamePath, "664", 2);
                 } else {
                     ToastUtil.showShortToast("你没有授权使用该软件，请与管理员联系");
                 }
@@ -154,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
     }
 
-    private void showNormalDialog() {
+    private void showNormalDialog(final int type) {
         final AlertDialog.Builder normalDialog =
                 new AlertDialog.Builder(MainActivity.this);
         normalDialog.setIcon(R.mipmap.ic_launcher);
@@ -164,9 +192,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(MainActivity.this, TrackerService.class);
-                        startService(intent);
-                        Toast.makeText(MainActivity.this, "防封开启成功，请保持专用防封在后台运行", Toast.LENGTH_SHORT).show();
+                        if (type == 1) {
+                            Intent intent = new Intent(MainActivity.this, GTrackerService.class);
+                            startService(intent);
+                        } else if (type == 2) {
+                            Intent intent = new Intent(MainActivity.this, ITrackerService.class);
+                            startService(intent);
+                        }
+                        ToastUtil.showShortToast("防封开启成功，请保持专用防封在后台运行");
                         dialog.dismiss();
                     }
                 });
@@ -174,9 +207,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(MainActivity.this, TrackerService.class);
-                        startService(intent);
-                        Toast.makeText(MainActivity.this, "防封开启成功，请保持专用防封在后台运行", Toast.LENGTH_SHORT).show();
+                        ToastUtil.showShortToast("防封没有开启");
                         dialog.dismiss();
                     }
                 });
@@ -189,10 +220,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             if (eventBean.type == 1) {
                 Toast.makeText(this, "专用防封已开启检测游戏封号行为，请保持软件在后台运行", Toast.LENGTH_SHORT).show();
             } else if (eventBean.type == 2) {
-                Toast.makeText(this, "专用防封数据发送成功", Toast.LENGTH_SHORT).show();
+                ToastUtil.showShortToast("专用防封数据发送成功");
             }
         } else {
-            Toast.makeText(this, "数据出错，请联系管理员", Toast.LENGTH_SHORT).show();
+            ToastUtil.showShortToast("数据出错，请联系管理员");
         }
     }
 

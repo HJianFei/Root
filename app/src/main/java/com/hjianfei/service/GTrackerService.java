@@ -18,9 +18,7 @@ import com.hjianfei.root.R;
 import com.hjianfei.utils.BaseApplication;
 import com.hjianfei.utils.Utils;
 
-public class TrackerService extends AccessibilityService {
-
-    private static final String TAG = "TrackerService";
+public class GTrackerService extends AccessibilityService {
 
     ConstraintLayout toucherLayout;
     WindowManager.LayoutParams params;
@@ -37,7 +35,7 @@ public class TrackerService extends AccessibilityService {
         if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             if (event.getPackageName().toString().equals("com.tencent.tmgp.pubgmhd") && event.getClassName().toString().equals("com.epicgames.ue4.GameActivity")) {
                 if (!isFirstSetting) {
-                    Utils.removeFile(BaseApplication.gamePath, "220", 1);
+                    Utils.removeChinaFile(BaseApplication.ChinaGamePath, "220", 1);
                     isFirstSetting = true;
                 }
             }
