@@ -6,7 +6,6 @@ import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.support.constraint.ConstraintLayout;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -29,7 +28,6 @@ public class TrackerService extends AccessibilityService {
 
     ImageButton imageButton1;
 
-    //状态栏高度.
     int statusBarHeight = -1;
     private boolean isFirstSetting = false;
 
@@ -97,29 +95,9 @@ public class TrackerService extends AccessibilityService {
         if (resourceId > 0) {
             statusBarHeight = getResources().getDimensionPixelSize(resourceId);
         }
-        Log.i(TAG, "状态栏高度为:" + statusBarHeight);
 
         //浮动窗口按钮.
         imageButton1 = (ImageButton) toucherLayout.findViewById(R.id.imageButton1);
-
-        imageButton1.setOnClickListener(new View.OnClickListener() {
-            long[] hints = new long[2];
-
-            @Override
-            public void onClick(View v) {
-//                Log.i(TAG, "点击了");
-//                System.arraycopy(hints, 1, hints, 0, hints.length - 1);
-//                hints[hints.length - 1] = SystemClock.uptimeMillis();
-//                if (SystemClock.uptimeMillis() - hints[0] >= 700) {
-//                    Log.i(TAG, "要执行");
-//                    Toast.makeText(TrackerService.this, "连续点击两次以退出", Toast.LENGTH_SHORT).show();
-//                } else {
-//                    Log.i(TAG, "即将关闭");
-//                    stopSelf();
-//                }
-            }
-        });
-
         imageButton1.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -137,14 +115,6 @@ public class TrackerService extends AccessibilityService {
     private int dp2px(Context context, float dpValue) {
         float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
-    }
-
-    /**
-     * px转换成dp
-     */
-    private int px2dp(Context context, float pxValue) {
-        float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (pxValue / scale + 0.5f);
     }
 
     @Override

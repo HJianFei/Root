@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     if (Settings.canDrawOverlays(MainActivity.this)) {
                         showNormalDialog();
                     } else {
-                        //若没有权限，提示获取.
                         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
                         Toast.makeText(MainActivity.this, "需要使用悬浮窗权限，监测游戏封号行为", Toast.LENGTH_SHORT).show();
                         startActivity(intent);
@@ -115,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         String[] perms = {Manifest.permission.READ_PHONE_STATE};
 
         if (EasyPermissions.hasPermissions(this, perms)) {//检查是否获取该权限
-//            Log.i(TAG, "已获取权限");
             showLoadingDialog();
 
         } else {
@@ -157,11 +155,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     private void showNormalDialog() {
-        /* @setIcon 设置对话框图标
-         * @setTitle 设置对话框标题
-         * @setMessage 设置对话框消息提示
-         * setXXX方法返回Dialog对象，因此可以链式设置属性
-         */
         final AlertDialog.Builder normalDialog =
                 new AlertDialog.Builder(MainActivity.this);
         normalDialog.setIcon(R.mipmap.ic_launcher);
@@ -187,7 +180,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         dialog.dismiss();
                     }
                 });
-        // 显示
         normalDialog.show();
     }
 
@@ -213,21 +205,16 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        //把申请权限的回调交由EasyPermissions处理
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
-    //下面两个方法是实现EasyPermissions的EasyPermissions.PermissionCallbacks接口
-    //分别返回授权成功和失败的权限
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
-//        Log.i(TAG, "获取成功的权限" + perms);
         showLoadingDialog();
     }
 
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
-//        Log.i(TAG, "获取失败的权限" + perms);
         ToastUtil.showShortToast("专用拦截没有获取必要权限");
     }
 }
