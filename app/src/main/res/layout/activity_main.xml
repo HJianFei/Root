@@ -48,13 +48,20 @@
         android:background="@color/colorPrimary"
         android:gravity="center"
         android:padding="15dp"
-        android:text="开启服务"
+        android:text="开启防封检测服务"
         android:textColor="#fff"
         android:textSize="14sp" />
 
     <TextView
-        android:id="@+id/listFile"
+        android:id="@+id/tv_end_service"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:padding="15dp"
+        android:text="游戏结束"
+        android:textColor="#fff"
+        android:textSize="14sp" />
 
 </LinearLayout>
