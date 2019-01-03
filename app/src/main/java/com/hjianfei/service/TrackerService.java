@@ -3,6 +3,7 @@ package com.hjianfei.service;
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.support.constraint.ConstraintLayout;
@@ -16,9 +17,10 @@ import android.widget.ImageButton;
 
 import com.hjianfei.root.R;
 import com.hjianfei.utils.BaseApplication;
+import com.hjianfei.utils.LogUtil;
 import com.hjianfei.utils.Utils;
 
-public class GTrackerService extends AccessibilityService {
+public class TrackerService extends AccessibilityService {
 
     ConstraintLayout toucherLayout;
     WindowManager.LayoutParams params;
@@ -27,16 +29,37 @@ public class GTrackerService extends AccessibilityService {
     ImageButton imageButton1;
 
     int statusBarHeight = -1;
-    private boolean isFirstSetting = false;
+    private boolean isCFirstSetting = false;
+    private boolean isIFirstSetting = false;
+    private int type;
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        type = intent.getIntExtra("type", 0);
+        return super.onStartCommand(intent, flags, startId);
+    }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
 
         if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-            if (event.getPackageName().toString().equals("com.tencent.tmgp.pubgmhd") && event.getClassName().toString().equals("com.epicgames.ue4.GameActivity")) {
-                if (!isFirstSetting) {
-                    Utils.removeChinaFile(BaseApplication.ChinaGamePath, "220", 1);
-                    isFirstSetting = true;
+            LogUtil.d("onResponse", event.getPackageName().toString() + "==" + event.getClassName().toString());
+            if (type == 2) {//国际服
+                if (event.getPackageName().toString().equals("com.tencent.ig") && event.getClassName().toString().equals("com.epicgames.ue4.GameActivity")) {
+                    if (!isIFirstSetting) {
+                        Utils.removeFile(BaseApplication.InternetGamePath, "220", 1);
+                        isIFirstSetting = true;
+                    }
+                }
+            } else if (type == 1) {//国服
+                if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+                    if (event.getPackageName().toString().equals("com.tencent.tmgp.pubgmhd") && event.getClassName().toString().equals("com.epicgames.ue4.GameActivity")) {
+                        if (!isCFirstSetting) {
+                            Utils.removeFile(BaseApplication.ChinaGamePath, "220", 1);
+                            isCFirstSetting = true;
+                        }
+                    }
                 }
             }
         }
@@ -122,4 +145,5 @@ public class GTrackerService extends AccessibilityService {
         }
         super.onDestroy();
     }
+
 }

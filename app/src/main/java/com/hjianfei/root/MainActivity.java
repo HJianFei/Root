@@ -13,8 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.android.tu.loadingdialog.LoadingDailog;
-import com.hjianfei.service.GTrackerService;
-import com.hjianfei.service.ITrackerService;
+import com.hjianfei.service.TrackerService;
 import com.hjianfei.utils.BaseApplication;
 import com.hjianfei.utils.EventBean;
 import com.hjianfei.utils.ToastUtil;
@@ -32,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     private LoadingDailog dialog;
 
-    private static String IMEI = "355457087264381";
+    private static String IMEI = "866146032212627";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             @Override
             public void onClick(View v) {
                 if (Utils.getIMEI(MainActivity.this).equals(IMEI)) {
-                    Utils.removeChinaFile(BaseApplication.ChinaGamePath, "664", 2);
+                    Utils.removeFile(BaseApplication.ChinaGamePath, "664", 2);
                 } else {
                     ToastUtil.showShortToast("你没有授权使用该软件，请与管理员联系");
                 }
@@ -127,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             @Override
             public void onClick(View v) {
                 if (Utils.getIMEI(MainActivity.this).equals(IMEI)) {
-                    Utils.removeChinaFile(BaseApplication.ChinaGamePath, "664", 2);
+                    Utils.removeFile(BaseApplication.InternetGamePath, "664", 2);
                 } else {
                     ToastUtil.showShortToast("你没有授权使用该软件，请与管理员联系");
                 }
@@ -193,10 +192,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (type == 1) {
-                            Intent intent = new Intent(MainActivity.this, GTrackerService.class);
+                            Intent intent = new Intent(MainActivity.this, TrackerService.class);
+                            intent.putExtra("type", 1);
                             startService(intent);
                         } else if (type == 2) {
-                            Intent intent = new Intent(MainActivity.this, ITrackerService.class);
+                            Intent intent = new Intent(MainActivity.this, TrackerService.class);
+                            intent.putExtra("type", 2);
                             startService(intent);
                         }
                         ToastUtil.showShortToast("防封开启成功，请保持专用防封在后台运行");

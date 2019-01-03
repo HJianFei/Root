@@ -112,44 +112,25 @@ public class Utils {
      * @param terminal
      * @param type
      */
-    public static void removeChinaFile(final String fromFilePath, final String terminal, final int type) {
+    public static void removeFile(final String fromFilePath, final String terminal, final int type) {
         if (!fileExists(fromFilePath)) {
             EventBus.getDefault().post(new EventBean(0, 1));
         }
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String[] strings = new String[1];
-//                strings[0] = "cp " + fromFilePath + " " + toFilePath;
-//                strings[1] = "rm -r " + fromFilePath;
-                strings[0] = "chmod -R " + terminal + " " + fromFilePath;
-                boolean isSuccess = Utils.execCmdsforResult(strings);
-                if (isSuccess) {
-                    EventBus.getDefault().post(new EventBean(1, type));
-                } else {
-                    EventBus.getDefault().post(new EventBean(2, type));
-                }
-
-            }
-        }).start();
-    }
-
-    public static void removeInternetFile(final String fromFilePath, final String toFilePath, final int type) {
-        if (!fileExists(fromFilePath)) {
-            EventBus.getDefault().post(new EventBean(0, 1));
-        }
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String[] strings = new String[3];
-                strings[0] = "cp " + fromFilePath + " " + toFilePath;
-                strings[1] = "rm -r " + fromFilePath;
-                strings[2] = "chmod -R 664 " + toFilePath;
-                boolean isSuccess = Utils.execCmdsforResult(strings);
-                if (isSuccess) {
-                    EventBus.getDefault().post(new EventBean(1, type));
-                } else {
-                    EventBus.getDefault().post(new EventBean(2, type));
+                try {
+                    String[] strings = new String[1];
+                    strings[0] = "chmod -R " + terminal + " " + fromFilePath;
+                    boolean isSuccess = Utils.execCmdsforResult(strings);
+                    if (isSuccess) {
+                        EventBus.getDefault().post(new EventBean(1, type));
+                    } else {
+                        EventBus.getDefault().post(new EventBean(2, type));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LogUtil.d("onResponse", e.toString());
                 }
 
             }
