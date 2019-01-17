@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     }
                     ToastUtil.showShortToast("数据校验成功");
                 }
-            }, 2000);
+            }, 300);
         } else {
             new Handler().postDelayed(new Runnable() {
                 public void run() {
@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     }
                     ToastUtil.showShortToast("数据校验失败");
                 }
-            }, 2000);
+            }, 300);
         }
     }
 
