@@ -6,14 +6,17 @@ import android.content.Context;
 public class BaseApplication extends Application {
 
 
-    public static String gamePath = "/data/data/com.tencent.tmgp.pubgmhd/lib/libUE4.so";
-    public static String tempPath = "";
+    public static String ChinaGamePath = "/data/data/com.tencent.tmgp.pubgmhd/lib/libUE4.so";
+    public static String InternetGamePath = "/data/data/com.tencent.ig/lib/libUE4.so";
+    public static String ChinaTempPath = "";
+    public static String InternetTempPath = "";
     public static Context mContext;
 
     @Override
     public void onCreate() {
         super.onCreate();
         this.mContext = getApplicationContext();
-        tempPath = getCacheDir() + "/libUe4.so";
+        ChinaTempPath = getCacheDir() + "/china/libUE4.so";
+        InternetTempPath = getCacheDir() + "/internet/libUE4.so";
     }
 }

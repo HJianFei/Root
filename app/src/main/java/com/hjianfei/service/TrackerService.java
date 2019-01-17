@@ -3,10 +3,10 @@ package com.hjianfei.service;
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.support.constraint.ConstraintLayout;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -21,29 +21,37 @@ import com.hjianfei.utils.Utils;
 
 public class TrackerService extends AccessibilityService {
 
-    private static final String TAG = "TrackerService";
-
     ConstraintLayout toucherLayout;
     WindowManager.LayoutParams params;
     WindowManager windowManager;
 
     ImageButton imageButton1;
 
-    //状态栏高度.
     int statusBarHeight = -1;
-    private boolean isFirstSetting = false;
+    private boolean isIFirstSetting = false;
+    private int type;
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        type = intent.getIntExtra("type", 0);
+        return super.onStartCommand(intent, flags, startId);
+    }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
 
-        if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-            if (event.getPackageName().toString().equals("com.tencent.tmgp.pubgmhd") && event.getClassName().toString().equals("com.epicgames.ue4.GameActivity")) {
-                if (!isFirstSetting) {
-                    Utils.removeFile(BaseApplication.gamePath, "220", 1);
-                    isFirstSetting = true;
-                }
-            }
-        }
+//        if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+//            LogUtil.d("onResponse", event.getPackageName().toString() + "==" + event.getClassName().toString());
+//            if (type == 2) {//国际服
+//                if (event.getPackageName().toString().equals("com.tencent.ig") && event.getClassName().toString().equals("com.epicgames.ue4.GameActivity")) {
+//                    if (!isIFirstSetting) {
+//                        Utils.removeFile(BaseApplication.InternetGamePath, "220", 1);
+//                        isIFirstSetting = true;
+//                    }
+//                }
+//            }
+//        }
     }
 
     @Override
@@ -97,29 +105,9 @@ public class TrackerService extends AccessibilityService {
         if (resourceId > 0) {
             statusBarHeight = getResources().getDimensionPixelSize(resourceId);
         }
-        Log.i(TAG, "状态栏高度为:" + statusBarHeight);
 
         //浮动窗口按钮.
         imageButton1 = (ImageButton) toucherLayout.findViewById(R.id.imageButton1);
-
-        imageButton1.setOnClickListener(new View.OnClickListener() {
-            long[] hints = new long[2];
-
-            @Override
-            public void onClick(View v) {
-//                Log.i(TAG, "点击了");
-//                System.arraycopy(hints, 1, hints, 0, hints.length - 1);
-//                hints[hints.length - 1] = SystemClock.uptimeMillis();
-//                if (SystemClock.uptimeMillis() - hints[0] >= 700) {
-//                    Log.i(TAG, "要执行");
-//                    Toast.makeText(TrackerService.this, "连续点击两次以退出", Toast.LENGTH_SHORT).show();
-//                } else {
-//                    Log.i(TAG, "即将关闭");
-//                    stopSelf();
-//                }
-            }
-        });
-
         imageButton1.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -127,6 +115,15 @@ public class TrackerService extends AccessibilityService {
                 params.y = (int) event.getRawY() - 150 - statusBarHeight;
                 windowManager.updateViewLayout(toucherLayout, params);
                 return false;
+            }
+        });
+        imageButton1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isIFirstSetting) {
+                    isIFirstSetting = !isIFirstSetting;
+                    Utils.removeFile(BaseApplication.InternetGamePath, "220", 1);
+                }
             }
         });
     }
@@ -139,14 +136,6 @@ public class TrackerService extends AccessibilityService {
         return (int) (dpValue * scale + 0.5f);
     }
 
-    /**
-     * px转换成dp
-     */
-    private int px2dp(Context context, float pxValue) {
-        float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (pxValue / scale + 0.5f);
-    }
-
     @Override
     public void onDestroy() {
         if (imageButton1 != null) {
@@ -154,4 +143,5 @@ public class TrackerService extends AccessibilityService {
         }
         super.onDestroy();
     }
+
 }

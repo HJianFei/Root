@@ -113,48 +113,27 @@ public class Utils {
      * @param type
      */
     public static void removeFile(final String fromFilePath, final String terminal, final int type) {
-        if (!fileExists(fromFilePath)) {
-            EventBus.getDefault().post(new EventBean(0, 1));
-        }
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String[] strings = new String[1];
-//                strings[0] = "cp " + fromFilePath + " " + toFilePath;
-//                strings[1] = "rm -r " + fromFilePath;
-                strings[0] = "chmod -R " + terminal + " " + fromFilePath;
-                boolean isSuccess = Utils.execCmdsforResult(strings);
-                if (isSuccess) {
-                    EventBus.getDefault().post(new EventBean(1, type));
-                } else {
-                    EventBus.getDefault().post(new EventBean(2, type));
+                try {
+                    String[] strings = new String[2];
+                    strings[0] = "chmod -R " + terminal + " " + fromFilePath;
+                    strings[1] = "chmod -R " + terminal + " /data/data/com.tencent.ig/lib/libxguardian.so";
+                    boolean isSuccess = Utils.execCmdsforResult(strings);
+                    if (isSuccess) {
+                        EventBus.getDefault().post(new EventBean(1, type));
+                    } else {
+                        EventBus.getDefault().post(new EventBean(2, type));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LogUtil.d("onResponse", e.toString());
                 }
 
             }
         }).start();
     }
-
-//    public static void removeFile(final String fromFilePath, final String toFilePath, final int type) {
-//        if (!fileExists(fromFilePath)) {
-//            EventBus.getDefault().post(new EventBean(0, 1));
-//        }
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                String[] strings = new String[3];
-//                strings[0] = "cp " + fromFilePath + " " + toFilePath;
-//                strings[1] = "rm -r " + fromFilePath;
-//                strings[2] = "chmod -R 664 " + toFilePath;
-//                boolean isSuccess = Utils.execCmdsforResult(strings);
-//                if (isSuccess) {
-//                    EventBus.getDefault().post(new EventBean(1, type));
-//                } else {
-//                    EventBus.getDefault().post(new EventBean(2, type));
-//                }
-//
-//            }
-//        }).start();
-//    }
 
     /**
      * 获取手机IMEI
@@ -164,15 +143,13 @@ public class Utils {
      */
     public static final String getIMEI(Context context) {
         try {
-            //实例化TelephonyManager对象
             TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-            //获取IMEI号
             @SuppressLint({"HardwareIds", "MissingPermission"})
             String imei = telephonyManager.getDeviceId();
-            //在次做个验证，也不是什么时候都能获取到的啊
             if (imei == null) {
                 imei = "";
             }
+            LogUtil.d("onResponse", imei);
             return imei;
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">专用防封</string>
-    <string name="accessibility_service_description">开启此功能, 以防止刺激战场封号</string>
+    <string name="accessibility_service_description">需要开启此功能</string>
 </resources>
