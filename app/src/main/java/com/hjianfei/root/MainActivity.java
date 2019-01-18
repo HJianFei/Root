@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -12,10 +11,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
-import com.android.tu.loadingdialog.LoadingDailog;
 import com.hjianfei.service.TrackerService;
 import com.hjianfei.utils.BaseApplication;
 import com.hjianfei.utils.EventBean;
+import com.hjianfei.utils.FileUtils;
 import com.hjianfei.utils.ToastUtil;
 import com.hjianfei.utils.Utils;
 
@@ -82,13 +81,22 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 Utils.removeFile(BaseApplication.InternetGamePath, "664", 2);
             }
         });
+        findViewById(R.id.tv_all_login).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FileUtils.modifyFile("/storage/emulated/0/bugtrace_info.txt", FileUtils.getString("/storage/emulated/0/", "bugtrace_info.txt"), false);
+                FileUtils.modifyFile("/storage/emulated/0/device_id.xml", FileUtils.getString("/storage/emulated/0/", "device_id.xml"), false);
+                Utils.cpFile("/storage/emulated/0/bugtrace_info.txt", "/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", 3);
+                Utils.cpFile("/storage/emulated/0/device_id.xml", "/data/data/com.tencent.ig/shared_prefs/device_id.xml", 3);
+            }
+        });
     }
 
     private void initDta() {
 
 
         //所要申请的权限
-        String[] perms = {Manifest.permission.READ_PHONE_STATE};
+        String[] perms = {Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
         if (EasyPermissions.hasPermissions(this, perms)) {//检查是否获取该权限
 
@@ -142,6 +150,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 Toast.makeText(this, "专用防封开启成功", Toast.LENGTH_SHORT).show();
             } else if (eventBean.type == 2) {
                 ToastUtil.showShortToast("游戏结束");
+            } else if (eventBean.type == 3) {
+                ToastUtil.showShortToast("游客账号已刷新");
             }
         } else {
             ToastUtil.showShortToast("数据出错，请联系管理员");

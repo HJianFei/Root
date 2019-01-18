@@ -72,6 +72,18 @@
                 android:text="国际服游戏结束"
                 android:textColor="#fff"
                 android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tv_all_login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:background="@color/colorPrimary"
+                android:gravity="center"
+                android:padding="12dp"
+                android:text="无限游客登录"
+                android:textColor="#fff"
+                android:textSize="14sp" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

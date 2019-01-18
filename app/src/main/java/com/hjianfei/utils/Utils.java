@@ -10,6 +10,7 @@ import org.greenrobot.eventbus.EventBus;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.OutputStream;
+import java.util.Random;
 
 /**
  * <pre>
@@ -135,6 +136,35 @@ public class Utils {
         }).start();
     }
 
+
+    /**
+     * 移动文件
+     *
+     * @param fromFilePath
+     * @param toFilePath
+     */
+    public static void cpFile(final String fromFilePath, final String toFilePath, final int type) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String[] strings = new String[1];
+                    strings[0] = "cp -rf " + fromFilePath + " " + toFilePath;
+                    boolean isSuccess = Utils.execCmdsforResult(strings);
+                    if (isSuccess) {
+                        EventBus.getDefault().post(new EventBean(1, type));
+                    } else {
+                        EventBus.getDefault().post(new EventBean(2, type));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LogUtil.d("onResponse", e.toString());
+                }
+
+            }
+        }).start();
+    }
+
     /**
      * 获取手机IMEI
      *
@@ -157,4 +187,22 @@ public class Utils {
         }
 
     }
+
+    public static String randomHexString(int len) {
+        try {
+            StringBuffer result = new StringBuffer();
+            for (int i = 0; i < len; i++) {
+                result.append(Integer.toHexString(new Random().nextInt(16)));
+            }
+            return result.toString().toUpperCase();
+
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+
+        }
+        return null;
+
+    }
+
 }
