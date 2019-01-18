@@ -29,6 +29,8 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
+    private LoadingDailog dialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,31 +87,55 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         findViewById(R.id.tv_all_login).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //复制文件
-                if (!Utils.isFastDoubleClick()) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                Utils.cpFile("/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", 3);
-                                Thread.sleep(500);
-                                FileUtils.modifyFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", FileUtils.getString(FileUtils.getDiskCacheDir(MainActivity.this) + "/", "bugtrace_info.txt"), false);
-                                Thread.sleep(500);
-                                Utils.cpFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", "/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", 3);
-                                Thread.sleep(500);
-                                Utils.cpFile("/data/data/com.tencent.ig/shared_prefs/device_id.xml", FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", 3);
-                                Thread.sleep(500);
-                                FileUtils.modifyFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", FileUtils.getString(FileUtils.getDiskCacheDir(MainActivity.this) + "/", "device_id.xml"), false);
-                                Thread.sleep(500);
-                                Utils.cpFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", "/data/data/com.tencent.ig/shared_prefs/device_id.xml", 3);
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                final AlertDialog.Builder normalDialog =
+                        new AlertDialog.Builder(MainActivity.this);
+                normalDialog.setIcon(R.mipmap.ic_launcher);
+                normalDialog.setTitle("重要提示");
+                normalDialog.setMessage("第一步：清除游戏全部数据;\n" +
+                        "第二步：正常打开游戏，等待下载3M的文件，下载完成关闭游戏;\n" +
+                        "第三步：点击无限游客登录按钮;\n" +
+                        "第四步：正常打开游戏;");
+                normalDialog.setPositiveButton("确定",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogd, int which) {
+                                dialogd.dismiss();
+                                LoadingDailog.Builder loadBuilder = new LoadingDailog.Builder(MainActivity.this)
+                                        .setMessage("处理中...")
+                                        .setCancelable(false)
+                                        .setCancelOutside(false);
+                                dialog = loadBuilder.create();
+                                dialog.show();
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            Utils.cpFile("/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", 4);
+                                            Thread.sleep(500);
+                                            FileUtils.modifyFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", FileUtils.getString(FileUtils.getDiskCacheDir(MainActivity.this) + "/", "bugtrace_info.txt"), false);
+                                            Thread.sleep(500);
+                                            Utils.cpFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", "/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", 4);
+                                            Thread.sleep(500);
+                                            Utils.cpFile("/data/data/com.tencent.ig/shared_prefs/device_id.xml", FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", 4);
+                                            Thread.sleep(500);
+                                            FileUtils.modifyFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", FileUtils.getString(FileUtils.getDiskCacheDir(MainActivity.this) + "/", "device_id.xml"), false);
+                                            Thread.sleep(500);
+                                            Utils.cpFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", "/data/data/com.tencent.ig/shared_prefs/device_id.xml", 3);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }).start();
                             }
-                        }
-                    }).start();
-                } else {
-                    ToastUtil.showShortToast("正在处理...");
-                }
+                        });
+                normalDialog.setNegativeButton("关闭",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogd, int which) {
+                                dialogd.dismiss();
+                            }
+                        });
+                normalDialog.show();
             }
         });
     }
@@ -174,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 ToastUtil.showShortToast("游戏结束");
             } else if (eventBean.type == 3) {
                 ToastUtil.showShortToast("游客账号已刷新");
+                dialog.dismiss();
             }
         } else {
             ToastUtil.showShortToast("数据出错，请联系管理员");
