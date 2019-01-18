@@ -84,10 +84,15 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         findViewById(R.id.tv_all_login).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FileUtils.modifyFile("/storage/emulated/0/bugtrace_info.txt", FileUtils.getString("/storage/emulated/0/", "bugtrace_info.txt"), false);
-                FileUtils.modifyFile("/storage/emulated/0/device_id.xml", FileUtils.getString("/storage/emulated/0/", "device_id.xml"), false);
-                Utils.cpFile("/storage/emulated/0/bugtrace_info.txt", "/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", 3);
-                Utils.cpFile("/storage/emulated/0/device_id.xml", "/data/data/com.tencent.ig/shared_prefs/device_id.xml", 3);
+                //复制文件
+                FileUtils.CopySdcardFile("/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt");
+                FileUtils.CopySdcardFile("/data/data/com.tencent.ig/shared_prefs/device_id.xml", FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml");
+                //修改文件
+                FileUtils.modifyFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", FileUtils.getString(FileUtils.getDiskCacheDir(MainActivity.this), "bugtrace_info.txt"), false);
+                FileUtils.modifyFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", FileUtils.getString(FileUtils.getDiskCacheDir(MainActivity.this), "device_id.xml"), false);
+                //覆盖文件
+                Utils.cpFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", "/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", 3);
+                Utils.cpFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", "/data/data/com.tencent.ig/shared_prefs/device_id.xml", 3);
             }
         });
     }
