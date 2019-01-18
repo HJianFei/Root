@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.tu.loadingdialog.LoadingDailog;
 import com.hjianfei.service.TrackerService;
 import com.hjianfei.utils.BaseApplication;
 import com.hjianfei.utils.EventBean;
@@ -85,14 +86,30 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             @Override
             public void onClick(View v) {
                 //复制文件
-                FileUtils.CopySdcardFile("/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt");
-                FileUtils.CopySdcardFile("/data/data/com.tencent.ig/shared_prefs/device_id.xml", FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml");
-                //修改文件
-                FileUtils.modifyFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", FileUtils.getString(FileUtils.getDiskCacheDir(MainActivity.this), "bugtrace_info.txt"), false);
-                FileUtils.modifyFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", FileUtils.getString(FileUtils.getDiskCacheDir(MainActivity.this), "device_id.xml"), false);
-                //覆盖文件
-                Utils.cpFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", "/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", 3);
-                Utils.cpFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", "/data/data/com.tencent.ig/shared_prefs/device_id.xml", 3);
+                if (!Utils.isFastDoubleClick()) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Utils.cpFile("/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", 3);
+                                Thread.sleep(500);
+                                FileUtils.modifyFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", FileUtils.getString(FileUtils.getDiskCacheDir(MainActivity.this) + "/", "bugtrace_info.txt"), false);
+                                Thread.sleep(500);
+                                Utils.cpFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", "/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", 3);
+                                Thread.sleep(500);
+                                Utils.cpFile("/data/data/com.tencent.ig/shared_prefs/device_id.xml", FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", 3);
+                                Thread.sleep(500);
+                                FileUtils.modifyFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", FileUtils.getString(FileUtils.getDiskCacheDir(MainActivity.this) + "/", "device_id.xml"), false);
+                                Thread.sleep(500);
+                                Utils.cpFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", "/data/data/com.tencent.ig/shared_prefs/device_id.xml", 3);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                } else {
+                    ToastUtil.showShortToast("正在处理...");
+                }
             }
         });
     }
