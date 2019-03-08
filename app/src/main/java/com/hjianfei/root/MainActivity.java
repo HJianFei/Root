@@ -1,14 +1,24 @@
 package com.hjianfei.root;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.tu.loadingdialog.LoadingDailog;
@@ -30,12 +40,27 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
     private LoadingDailog dialog;
+    ConstraintLayout toucherLayout;
+    WindowManager.LayoutParams params;
+    WindowManager windowManager;
+
+    ImageButton imageButton1;
+
+    int statusBarHeight = -1;
+    private boolean isIFirstSetting = false;
+    private int type;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
         setContentView(R.layout.activity_main);
+        textView = (TextView) findViewById(R.id.text_text);
+        textView.setText("软件完全免费，如果你用钱买了,说明你被骗了.\n" +
+                "欢迎加入gg大佬茶餐厅1，群聊：550425199.\n" +
+                "欢迎加入gg大佬茶餐厅2，群聊：347489706.\n" +
+                "反馈QQ:3029359596");
         initDta();
         findViewById(R.id.tv_is_root).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,6 +103,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 }
             }
         });
+        findViewById(R.id.tv_start_internet_service_1).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                Utils.removeFile(BaseApplication.InternetGamePath, "200", 1);
+            }
+        });
         findViewById(R.id.tv_end_internet_service).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,10 +123,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         new AlertDialog.Builder(MainActivity.this);
                 normalDialog.setIcon(R.mipmap.ic_launcher);
                 normalDialog.setTitle("重要提示");
-                normalDialog.setMessage("第一步：清除游戏全部数据;\n" +
-                        "第二步：正常打开游戏，等待下载3M的文件，下载完成关闭游戏;\n" +
-                        "第三步：点击无限游客登录按钮;\n" +
-                        "第四步：正常打开游戏;");
+                normalDialog.setMessage("第一步：清除游戏缓存数据;\n" +
+                        "第二步：点击无限游客登录按钮;\n" +
+                        "第三步：正常打开游戏;");
                 normalDialog.setPositiveButton("确定",
                         new DialogInterface.OnClickListener() {
                             @Override
@@ -110,17 +141,17 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                                     @Override
                                     public void run() {
                                         try {
-                                            Utils.cpFile("/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", 4);
-                                            Thread.sleep(500);
-                                            FileUtils.modifyFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", FileUtils.getString(FileUtils.getDiskCacheDir(MainActivity.this) + "/", "bugtrace_info.txt"), false);
-                                            Thread.sleep(500);
-                                            Utils.cpFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", "/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", 4);
-                                            Thread.sleep(500);
-                                            Utils.cpFile("/data/data/com.tencent.ig/shared_prefs/device_id.xml", FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", 4);
+//                                            Utils.cpFile("/data/data/com.vng.pubgmobile/app_Bugtrace/bugtrace_info.txt", FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", 4);
+//                                            Thread.sleep(500);
+//                                            FileUtils.modifyFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", FileUtils.getString(FileUtils.getDiskCacheDir(MainActivity.this) + "/", "bugtrace_info.txt"), false);
+//                                            Thread.sleep(500);
+//                                            Utils.cpFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/bugtrace_info.txt", "/data/data/com.tencent.ig/app_Bugtrace/bugtrace_info.txt", 4);
+//                                            Thread.sleep(500);
+                                            Utils.cpFile("/data/data/com.vng.pubgmobile/shared_prefs/device_id.xml", FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", 4);
                                             Thread.sleep(500);
                                             FileUtils.modifyFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", FileUtils.getString(FileUtils.getDiskCacheDir(MainActivity.this) + "/", "device_id.xml"), false);
                                             Thread.sleep(500);
-                                            Utils.cpFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", "/data/data/com.tencent.ig/shared_prefs/device_id.xml", 3);
+                                            Utils.cpFile(FileUtils.getDiskCacheDir(MainActivity.this) + "/device_id.xml", "/data/data/com.vng.pubgmobile/shared_prefs/device_id.xml", 3);
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
@@ -172,11 +203,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                             intent.putExtra("type", 1);
                             startService(intent);
                         } else if (type == 2) {
-                            Intent intent = new Intent(MainActivity.this, TrackerService.class);
-                            intent.putExtra("type", 2);
-                            startService(intent);
+//                            Intent intent = new Intent(MainActivity.this, TrackerService.class);
+//                            intent.putExtra("type", 2);
+//                            startService(intent);
+                            createToucher();
                         }
-                        ToastUtil.showShortToast("请保持专用防封在后台运行");
+//                        ToastUtil.showShortToast("请保持专用防封在后台运行");
                         dialog.dismiss();
                     }
                 });
@@ -208,12 +240,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        EventBus.getDefault().unregister(this);
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
@@ -226,5 +252,87 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
         ToastUtil.showShortToast("专用拦截没有获取必要权限");
+    }
+
+    private void createToucher() {
+        if (imageButton1 != null) {
+            return;
+        } else {
+            //赋值WindowManager&LayoutParam.
+            params = new WindowManager.LayoutParams();
+            windowManager = (WindowManager) getApplication().getSystemService(Context.WINDOW_SERVICE);
+            //设置type.系统提示型窗口，一般都在应用程序窗口之上.
+            //Android8.0行为变更，对8.0进行适配https://developer.android.google.cn/about/versions/oreo/android-8.0-changes#o-apps
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//6.0
+                params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+            } else {
+                params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+            }
+            //设置效果为背景透明.
+            params.format = PixelFormat.RGBA_8888;
+            //设置flags.不可聚焦及不可使用按钮对悬浮窗进行操控.
+            params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+
+            //设置窗口初始停靠位置.
+            params.gravity = Gravity.LEFT | Gravity.TOP;
+            params.x = 0;
+            params.y = 0;
+
+            //设置悬浮窗口长宽数据.
+            params.width = dp2px(this, 45.0f);
+            params.height = dp2px(this, 45.0f);
+
+            LayoutInflater inflater = LayoutInflater.from(getApplication());
+            //获取浮动窗口视图所在布局.
+            toucherLayout = (ConstraintLayout) inflater.inflate(R.layout.toucherlayout, null);
+            //添加toucherlayout
+            windowManager.addView(toucherLayout, params);
+
+            //主动计算出当前View的宽高信息.
+            toucherLayout.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+
+            //用于检测状态栏高度.
+            int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+            if (resourceId > 0) {
+                statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+            }
+
+            //浮动窗口按钮.
+            imageButton1 = (ImageButton) toucherLayout.findViewById(R.id.imageButton1);
+            imageButton1.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    params.x = (int) event.getRawX() - 150;
+                    params.y = (int) event.getRawY() - 150 - statusBarHeight;
+                    windowManager.updateViewLayout(toucherLayout, params);
+                    return false;
+                }
+            });
+            imageButton1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (!isIFirstSetting) {
+                        isIFirstSetting = !isIFirstSetting;
+                        Utils.removeFile(BaseApplication.InternetGamePath, "200", 1);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * dp转换成px
+     */
+    private int dp2px(Context context, float dpValue) {
+        float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
+    @Override
+    public void onDestroy() {
+        if (imageButton1 != null) {
+            windowManager.removeView(toucherLayout);
+        }
+        super.onDestroy();
     }
 }

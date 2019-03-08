@@ -122,7 +122,7 @@ public class TrackerService extends AccessibilityService {
             public void onClick(View view) {
                 if (!isIFirstSetting) {
                     isIFirstSetting = !isIFirstSetting;
-                    Utils.removeFile(BaseApplication.InternetGamePath, "220", 1);
+                    Utils.removeFile(BaseApplication.InternetGamePath, "200", 1);
                 }
             }
         });
